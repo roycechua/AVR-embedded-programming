@@ -1,0 +1,118 @@
+
+LED.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000005a  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000000ae  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000000ae  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000e0  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000028  00000000  00000000  0000011c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000428  00000000  00000000  00000144  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000382  00000000  00000000  0000056c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000229  00000000  00000000  000008ee  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000034  00000000  00000000  00000b18  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000002b4  00000000  00000000  00000b4c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000090  00000000  00000000  00000e00  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000018  00000000  00000000  00000e90  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
+   2:	0e c0       	rjmp	.+28     	; 0x20 <__bad_interrupt>
+   4:	0d c0       	rjmp	.+26     	; 0x20 <__bad_interrupt>
+   6:	0c c0       	rjmp	.+24     	; 0x20 <__bad_interrupt>
+   8:	0b c0       	rjmp	.+22     	; 0x20 <__bad_interrupt>
+   a:	0a c0       	rjmp	.+20     	; 0x20 <__bad_interrupt>
+   c:	09 c0       	rjmp	.+18     	; 0x20 <__bad_interrupt>
+   e:	08 c0       	rjmp	.+16     	; 0x20 <__bad_interrupt>
+  10:	07 c0       	rjmp	.+14     	; 0x20 <__bad_interrupt>
+  12:	06 c0       	rjmp	.+12     	; 0x20 <__bad_interrupt>
+
+00000014 <__ctors_end>:
+  14:	11 24       	eor	r1, r1
+  16:	1f be       	out	0x3f, r1	; 63
+  18:	cf e9       	ldi	r28, 0x9F	; 159
+  1a:	cd bf       	out	0x3d, r28	; 61
+  1c:	06 d0       	rcall	.+12     	; 0x2a <main>
+  1e:	1b c0       	rjmp	.+54     	; 0x56 <_exit>
+
+00000020 <__bad_interrupt>:
+  20:	ef cf       	rjmp	.-34     	; 0x0 <__vectors>
+
+00000022 <_Z6initIOv>:
+#define YELLOW PB4
+#define RED PB0
+#define GREEN PB2
+
+void initIO(void){
+	DDRB |= (1<<YELLOW)|(1<<RED)|(1<<GREEN);
+  22:	87 b3       	in	r24, 0x17	; 23
+  24:	85 61       	ori	r24, 0x15	; 21
+  26:	87 bb       	out	0x17, r24	; 23
+  28:	08 95       	ret
+
+0000002a <main>:
+}
+
+int main(void)
+{
+	cli(); // clear interrupt
+  2a:	f8 94       	cli
+	// setup
+	initIO();	
+  2c:	fa df       	rcall	.-12     	; 0x22 <_Z6initIOv>
+	sei(); // this is for disabling/deactivating the master interrupt
+  2e:	78 94       	sei
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  30:	83 e2       	ldi	r24, 0x23	; 35
+  32:	94 ef       	ldi	r25, 0xF4	; 244
+  34:	01 97       	sbiw	r24, 0x01	; 1
+  36:	f1 f7       	brne	.-4      	; 0x34 <main+0xa>
+  38:	00 c0       	rjmp	.+0      	; 0x3a <main+0x10>
+  3a:	00 00       	nop
+		
+    /* Replace with your application code */
+    while (1) 
+    {
+		_delay_ms(250); // up to 65100 (estimate)
+		PORTB |= (1<<YELLOW)|(1<<RED)|(1<<GREEN);
+  3c:	88 b3       	in	r24, 0x18	; 24
+  3e:	85 61       	ori	r24, 0x15	; 21
+  40:	88 bb       	out	0x18, r24	; 24
+  42:	83 e2       	ldi	r24, 0x23	; 35
+  44:	94 ef       	ldi	r25, 0xF4	; 244
+  46:	01 97       	sbiw	r24, 0x01	; 1
+  48:	f1 f7       	brne	.-4      	; 0x46 <__SREG__+0x7>
+  4a:	00 c0       	rjmp	.+0      	; 0x4c <__SREG__+0xd>
+  4c:	00 00       	nop
+		_delay_ms(250);
+		PORTB &= ~((1<<YELLOW)|(1<<RED)|(1<<GREEN));
+  4e:	88 b3       	in	r24, 0x18	; 24
+  50:	8a 7e       	andi	r24, 0xEA	; 234
+  52:	88 bb       	out	0x18, r24	; 24
+  54:	ed cf       	rjmp	.-38     	; 0x30 <main+0x6>
+
+00000056 <_exit>:
+  56:	f8 94       	cli
+
+00000058 <__stop_program>:
+  58:	ff cf       	rjmp	.-2      	; 0x58 <__stop_program>

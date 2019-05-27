@@ -1,0 +1,151 @@
+
+TRAFFIC_LIGHT.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000082  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000000d6  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000000d6  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000108  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000030  00000000  00000000  00000144  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000484  00000000  00000000  00000174  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000003ac  00000000  00000000  000005f8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000257  00000000  00000000  000009a4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000044  00000000  00000000  00000bfc  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000002e9  00000000  00000000  00000c40  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000000d8  00000000  00000000  00000f29  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000020  00000000  00000000  00001001  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
+   2:	0e c0       	rjmp	.+28     	; 0x20 <__bad_interrupt>
+   4:	0d c0       	rjmp	.+26     	; 0x20 <__bad_interrupt>
+   6:	0c c0       	rjmp	.+24     	; 0x20 <__bad_interrupt>
+   8:	0b c0       	rjmp	.+22     	; 0x20 <__bad_interrupt>
+   a:	0a c0       	rjmp	.+20     	; 0x20 <__bad_interrupt>
+   c:	09 c0       	rjmp	.+18     	; 0x20 <__bad_interrupt>
+   e:	08 c0       	rjmp	.+16     	; 0x20 <__bad_interrupt>
+  10:	07 c0       	rjmp	.+14     	; 0x20 <__bad_interrupt>
+  12:	06 c0       	rjmp	.+12     	; 0x20 <__bad_interrupt>
+
+00000014 <__ctors_end>:
+  14:	11 24       	eor	r1, r1
+  16:	1f be       	out	0x3f, r1	; 63
+  18:	cf e9       	ldi	r28, 0x9F	; 159
+  1a:	cd bf       	out	0x3d, r28	; 61
+  1c:	2b d0       	rcall	.+86     	; 0x74 <main>
+  1e:	2f c0       	rjmp	.+94     	; 0x7e <_exit>
+
+00000020 <__bad_interrupt>:
+  20:	ef cf       	rjmp	.-34     	; 0x0 <__vectors>
+
+00000022 <_Z6initIOv>:
+#define YELLOW PB4
+#define RED PB0
+#define GREEN PB2
+
+void initIO(void){
+	DDRB |= (1<<YELLOW)|(1<<RED)|(1<<GREEN);
+  22:	87 b3       	in	r24, 0x17	; 23
+  24:	85 61       	ori	r24, 0x15	; 21
+  26:	87 bb       	out	0x17, r24	; 23
+  28:	08 95       	ret
+
+0000002a <_Z13traffic_lightv>:
+}
+
+void traffic_light(void){
+	PORTB |= (1<<RED);
+  2a:	c0 9a       	sbi	0x18, 0	; 24
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  2c:	2f eb       	ldi	r18, 0xBF	; 191
+  2e:	87 e2       	ldi	r24, 0x27	; 39
+  30:	99 e0       	ldi	r25, 0x09	; 9
+  32:	21 50       	subi	r18, 0x01	; 1
+  34:	80 40       	sbci	r24, 0x00	; 0
+  36:	90 40       	sbci	r25, 0x00	; 0
+  38:	e1 f7       	brne	.-8      	; 0x32 <_Z13traffic_lightv+0x8>
+  3a:	00 c0       	rjmp	.+0      	; 0x3c <_Z13traffic_lightv+0x12>
+  3c:	00 00       	nop
+	
+	_delay_ms(3000);
+	PORTB &= (0<<RED);
+  3e:	88 b3       	in	r24, 0x18	; 24
+  40:	18 ba       	out	0x18, r1	; 24
+	PORTB |= (1<<GREEN);
+  42:	c2 9a       	sbi	0x18, 2	; 24
+  44:	2f eb       	ldi	r18, 0xBF	; 191
+  46:	87 e2       	ldi	r24, 0x27	; 39
+  48:	99 e0       	ldi	r25, 0x09	; 9
+  4a:	21 50       	subi	r18, 0x01	; 1
+  4c:	80 40       	sbci	r24, 0x00	; 0
+  4e:	90 40       	sbci	r25, 0x00	; 0
+  50:	e1 f7       	brne	.-8      	; 0x4a <__SREG__+0xb>
+  52:	00 c0       	rjmp	.+0      	; 0x54 <__SREG__+0x15>
+  54:	00 00       	nop
+	
+	_delay_ms(3000);
+	PORTB &= (0<<GREEN);
+  56:	88 b3       	in	r24, 0x18	; 24
+  58:	18 ba       	out	0x18, r1	; 24
+	PORTB |= (1<<YELLOW);
+  5a:	c4 9a       	sbi	0x18, 4	; 24
+  5c:	2f e9       	ldi	r18, 0x9F	; 159
+  5e:	86 e8       	ldi	r24, 0x86	; 134
+  60:	91 e0       	ldi	r25, 0x01	; 1
+  62:	21 50       	subi	r18, 0x01	; 1
+  64:	80 40       	sbci	r24, 0x00	; 0
+  66:	90 40       	sbci	r25, 0x00	; 0
+  68:	e1 f7       	brne	.-8      	; 0x62 <__SREG__+0x23>
+  6a:	00 c0       	rjmp	.+0      	; 0x6c <__SREG__+0x2d>
+  6c:	00 00       	nop
+	_delay_ms(500);
+	PORTB &= (0<<YELLOW);
+  6e:	88 b3       	in	r24, 0x18	; 24
+  70:	18 ba       	out	0x18, r1	; 24
+  72:	08 95       	ret
+
+00000074 <main>:
+}
+
+int main(void)
+{
+	cli(); // clear interrupt
+  74:	f8 94       	cli
+	// setup
+	initIO();
+  76:	d5 df       	rcall	.-86     	; 0x22 <_Z6initIOv>
+	sei(); // this is for disabling/deactivating the master interrupt
+  78:	78 94       	sei
+
+	/* Replace with your application code */
+	while (1)
+	{
+		traffic_light();
+  7a:	d7 df       	rcall	.-82     	; 0x2a <_Z13traffic_lightv>
+  7c:	fe cf       	rjmp	.-4      	; 0x7a <main+0x6>
+
+0000007e <_exit>:
+  7e:	f8 94       	cli
+
+00000080 <__stop_program>:
+  80:	ff cf       	rjmp	.-2      	; 0x80 <__stop_program>
